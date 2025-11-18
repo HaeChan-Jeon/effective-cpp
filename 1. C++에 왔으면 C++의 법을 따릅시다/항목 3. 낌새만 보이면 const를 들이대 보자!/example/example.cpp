@@ -1,49 +1,42 @@
 ﻿#include <iostream>
-#include <vector>
 
-//void f1(const Widget* pw);		// f1은 상수 widget 객체에 대한
-//									// 포인터를 매개변수로 취합니다.
-//
-//void f2(Widget const* pw);		// f2도 그렇고요.
+class TextBlock {
+public:
+	TextBlock(std::string s) : text(s) {}
+
+	const char& operator[] (std::size_t position) const	// 상수 객체에 대한
+	{ return text[position]; }							// operator[]
+
+	char& operator[] (std::size_t position)				// 비상수 객체에 대한
+	{ return text[position]; }							// operator[]
+
+private:
+	std::string text;
+};
+
+void print(const TextBlock& ctb)	// 이 함수에서 ctb는 상수 객체로 쓰입니다.
+{
+	std::cout << ctb[0];			// TextBlock::operator[]의 상수
+									// 멤버를 호출합니다.
+}
 
 int main()
 {
-	char greeting[] = "Hello";
+	TextBlock tb("Hello");			// TextBlock::operator[]의
+	std::cout << tb[0];				// 비상수 멤버를 호출합니다.
 
-	char* p = greeting;				// 비상수 포인터,
-									// 비상수 데이터
+	const TextBlock ctb("World");	// TextBlock::operator[]의
+	std::cout << ctb[0];			// 상수 멤버를 호출합니다.
 
-	const char* p = greeting;		// 비상수 포인터,
-									// 상수 데이터
+	std::cout << tb[0];				// 좋습니다. 비상수 버전의
+									// TextBlock 객체를 읽습니다.
 
-	char* const p = greeting;		// 상수 포인터
-									// 비상수 데이터
+	tb[0] = 'x';					// 역시 문제없죠. 비상수 버전의
+									// TextBlock 객체를 읽습니다.
 
-	const char* const p = greeting;	// 상수 포인터,
-									// 상수 데이터
+	std::cout << ctb[0];			// 좋습니다. 상수 버전의
+									// TextBlock 객체를 읽습니다.
 
-
-
-	std::vector<int> vec;
-
-	const std::vector<int>::iterator iter = vec.begin();
-									// iter는 T* const처럼 동작합니다.
-	*iter = 10;						// OK, iter가 가르키는 대상을 변경합니다.
-	//++iter;						// 에러! iter는 상수입니다.
-
-	std::vector<int>::const_iterator cIter = vec.begin();
-									// cIter는 const T*처럼 동작합니다.
-	//*cIter = 10;					// 에러! *cIter가 상수이기 때문에 안됩니다.
-	++cIter;						// 이건 문제없습니다. cIter를 변경하니까요.
-
-
-
-	class Rational {};
-	const Rational operator*(const Rational& lhs, const Rational& rhs);
-
-	Rational a, b, c;
-	//(a* b) = c;					// a*b의 결과에 대고
-									// operator=를 호출하다니요!
-
-	//if (a * b = c)				// 어흑, 나는 원래 비교하려고 그랬던 건데!
+	//ctb[0] = 'x';					// 컴파일 에러 발생! 상수 버전의
+									// TextBlock 객체를 대해 쓰기는 안 됩니다.
 }
